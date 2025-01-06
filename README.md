@@ -4,7 +4,7 @@ The fast Continuous Wavelet Transform (fCWT)
 ====================================
 ![Stable version](https://img.shields.io/badge/version-2.0.0-blue) ![PyPI version](https://badge.fury.io/py/fcwt.svg)
 
-The fast Continuous Wavelet Transform (fCWT) is a highly optimized C++ library for very fast calculation of the CWT in C++, Matlab, and Python.
+The fast Continuous Wavelet Transform (fCWT) is a highly optimized C++ library for very fast calculation of the CWT in C++, Matlab, Python and R.
 
 **fCWT has been featured on the January 2022 cover of NATURE Computational Science**. In this article, fCWT is compared against eight competitor algorithms, tested on noise resistance and validated on synthetic electroencephalography and in vivo extracellular local field potential data.
 
@@ -40,7 +40,7 @@ Features
 Quickstart 
 ============
 
-fCWT's implementation can be used to accelerate your C++, Python, and Matlab projects! Build the C++ library to achieve the highest efficiency or use the Matlab and Python packages to maximize integration possibilities. 
+fCWT's implementation can be used to accelerate your C++, Python, R, and Matlab projects! Build the C++ library to achieve the highest efficiency or use the Matlab, Python and R packages to maximize integration possibilities. 
 
 Python
 ---
@@ -69,6 +69,25 @@ $ cmake ../ -DBUILD_MATLAB=ON
 $ make 
 ```
 Two .mex files should now have been created in the `MATLAB` folder. Run the `example.mlx` live script to see how to use fCWT in Matlab. fCWT has been tested in R2022b on an Intel Apple Macbook Pro.
+
+R
+---
+The repository [fCWTr](https://github.com/lschneiderbauer/fCWTr) features an R package exposing fcwt features. See its [documentation](https://lschneiderbauer.github.io/fCWTr/) for details. Also included is an [article](https://lschneiderbauer.github.io/fCWTr/articles/sigma.html) which discusses the parameter $\Sigma$ in more detail and explains how to set it correctly for your use case.
+
+You can install the latest CRAN release of fCWTr with:
+
+``` r
+install.packages("fCWTr")
+```
+
+Alternatively, you can install the development version of fCWTr like so
+(requiring installed [devtools](https://devtools.r-lib.org/) package):
+
+``` r
+devtools::install_github("lschneiderbauer/fCWTr")
+```
+
+Note that the installation process might fail if the package needs to be compiled from source and system requirements are not satisfied. The error message should give you hints, however, on what’s missing on your system.
 
 C++
 ---
@@ -134,7 +153,51 @@ fcwt.plot(signal, fs, f0=f0, f1=f1, fn=fn)
 ```
 
 Output:
+
 ![](https://github.com/fastlib/fCWT/blob/main/img/pythontest.png)
+
+R Example
+==============
+This is the R counterpart to the Python example:
+
+``` r
+library(fCWTr)
+
+n <- 1000 * 100 # 100 seconds
+ts <- 0:n
+
+# Generate linear chirp
+signal <- sin(2 * pi * ((1 + (20 * ts) / n) * (ts / 500)))
+
+out <-
+  fcwt(
+    signal,
+    x_sample_freq = u(1000, "Hz"),
+    freq_begin = u(1, "Hz"),
+    freq_end = u(101, "Hz"),
+    freq_scale = "linear"
+  )
+
+print(out)
+#> _Scalogram_
+#> * (Time/Frequency) dimension:  ( 1220 , 144 )
+#> * Sampling rate: 12.05599 [Hz]
+#> * Frequency scale: 1 [Hz] - 101 [Hz], linear
+#> * Time offset: 0 [s] 
+#> * Sigma: 6.283185
+#>   o Time resolution at  1 [Hz] :  25.13274 [1/Hz] 
+#>   o Time resolution at  101 [Hz] :  0.248839 [1/Hz] 
+#>   o Relative frequency resolution:  0.1013212 
+#> * Time/frequency matrix summary
+#>    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
+#>  0.0000  0.0000  0.0000  0.0003  0.0000  0.0115    2016
+
+plot(out)
+```
+
+Output:
+
+![](img/rtest.png)
 
 C++ Example
 =======
